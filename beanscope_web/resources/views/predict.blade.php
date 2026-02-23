@@ -103,7 +103,7 @@
                             
                             // Check confidence threshold
                             $maxConfidence = floatval(str_replace('%', '', $result['confidence']));
-                            $isLowConfidence = $maxConfidence < 80;
+                            $isLowConfidence = $maxConfidence < 60;
                         @endphp
 
                         <!-- Low Confidence Warning -->
@@ -116,7 +116,7 @@
                             <p class="mb-0">
                                 <strong>Kemungkinan bukan biji kopi!</strong><br>
                                 Prediksi memiliki confidence {{ $result['confidence'] }} yang rendah. 
-                                Gambar yang diupload mungkin bukan biji kopi.
+                                Gambar yang diupload mungkin bukan biji kopi atau ada kemiripan pola pada gambar biji kopi.
                                 Silakan upload gambar biji kopi yang lebih jelas.
                             </p>
                         </div>

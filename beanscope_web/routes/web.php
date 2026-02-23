@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\CoffeePredictionController;
+use App\Http\Controllers\BatchTestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,5 +23,8 @@ Route::get('/', function () {
 
 Route::get('/predict', [CoffeePredictionController::class, 'index'])->name('predict.index');
 Route::post('/predict', [CoffeePredictionController::class, 'predict'])->name('predict');
+
+Route::get('/batch-test', [BatchTestController::class, 'index'])->name('batch-test.index');
+Route::post('/batch-test', [BatchTestController::class, 'process'])->name('batch-test.process');
 
 

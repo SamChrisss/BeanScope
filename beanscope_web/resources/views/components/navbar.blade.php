@@ -29,6 +29,11 @@
                         <i class="bi bi-magic"></i> Analyze
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('batch-test.*') ? 'active' : '' }}" href="{{ route('batch-test.index') }}" data-nav="batchtest">
+                        <i class="bi bi-archive"></i> Batch Test
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

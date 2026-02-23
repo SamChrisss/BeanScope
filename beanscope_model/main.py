@@ -14,7 +14,10 @@ Kelas yang dapat dideteksi:
 import os
 import io
 import logging
-from typing import Dict, Optional
+import zipfile
+import tempfile
+import shutil
+from typing import Dict, List, Optional
 import numpy as np
 import tensorflow as tf
 from PIL import Image
@@ -48,7 +51,7 @@ app.add_middleware(
 
 # ==================== KONFIGURASI ====================
 # Menggunakan best_model.keras sebagai model utama
-MODEL_PATH = r"D:\Skripsi\bestmodel\BeanScope\beanscope_model\model\best_coffee_model.keras"
+MODEL_PATH = r"D:\Skripsi\bestmodel\BeanScope\beanscope_model\model\bestku_model.keras"
 
 CLASS_NAMES = [
     "Broken",           # Biji pecah
@@ -296,6 +299,163 @@ def predict(file: UploadFile = File(...)) -> Dict:
     finally:
         # Pastikan file ditutup
         file.file.close()
+
+
+@app.post("/predict-batch", tags=["Prediction"])
+async def predict_batch(file: UploadFile = File(...)) -> Dict:
+    """
+    Endpoint untuk prediksi batch dari file ZIP.
+    ZIP harus berisi sub-folder dengan nama kelas sebagai label asli.
+    Contoh:
+      dataset.zip/
+        Broken/img1.jpg
+        Green/img2.jpg
+        ...
+
+    Returns:
+        Dict berisi results (list), confusion_matrix (5x5), metrics (accuracy, per-class)
+    """
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model belum dimuat.")
+
+    # Validasi tipe file
+    if file.content_type not in ["application/zip", "application/x-zip-compressed",
+                                  "application/octet-stream", "multipart/form-data"]:
+        # coba cek ekstensi
+        if not (file.filename or "").lower().endswith(".zip"):
+            raise HTTPException(status_code=400, detail="File harus berupa ZIP.")
+
+    zip_bytes = await file.read()
+    tmp_dir = tempfile.mkdtemp()
+    results: List[Dict] = []
+
+    VALID_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+
+    try:
+        with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+            zf.extractall(tmp_dir)
+
+        # Kalau ZIP berisi satu folder root (mis. dataset/Broken, dataset/Green, ...),
+        # turun satu level agar class_dir langsung menunjuk ke folder kelas.
+        top_entries = [e for e in os.listdir(tmp_dir)]
+        if len(top_entries) == 1 and os.path.isdir(os.path.join(tmp_dir, top_entries[0])):
+            inner = os.path.join(tmp_dir, top_entries[0])
+            # Pastikan folder tersebut berisi sub-folder kelas, bukan gambar langsung
+            inner_entries = os.listdir(inner)
+            has_class_folder = any(
+                os.path.isdir(os.path.join(inner, e)) for e in inner_entries
+            )
+            if has_class_folder:
+                tmp_dir = inner  # Gunakan folder di dalam sebagai root
+
+        # Iterasi sub-folder sebagai ground truth label
+        for true_label in CLASS_NAMES:
+            class_dir = os.path.join(tmp_dir, true_label)
+            if not os.path.isdir(class_dir):
+                # Coba cari folder case-insensitive (normalkan spasi, jangan hapus)
+                for d in os.listdir(tmp_dir):
+                    if d.lower() == true_label.lower():
+                        class_dir = os.path.join(tmp_dir, d)
+                        break
+                    # Juga coba tanpa spasi (fullblack vs full black)
+                    if d.lower().replace(" ", "") == true_label.lower().replace(" ", ""):
+                        class_dir = os.path.join(tmp_dir, d)
+                        break
+                else:
+                    logger.warning(f"Folder untuk kelas '{true_label}' tidak ditemukan di ZIP.")
+                    continue  # Folder tidak ada, skip
+
+            for fname in os.listdir(class_dir):
+                ext = os.path.splitext(fname)[1].lower()
+                if ext not in VALID_EXTENSIONS:
+                    continue
+                fpath = os.path.join(class_dir, fname)
+                try:
+                    with open(fpath, "rb") as f:
+                        img_bytes = f.read()
+                    img_array = prepare_image(img_bytes)
+                    preds = model.predict(img_array, verbose=0)[0]
+                    pred_idx = int(np.argmax(preds))
+                    pred_label = CLASS_NAMES[pred_idx]
+                    confidence = float(preds[pred_idx])
+                    results.append({
+                        "filename": fname,
+                        "true_label": true_label,
+                        "predicted_label": pred_label,
+                        "confidence": round(confidence * 100, 2),
+                        "correct": pred_label == true_label,
+                        "all_scores": {
+                            CLASS_NAMES[i]: round(float(preds[i]) * 100, 2)
+                            for i in range(len(CLASS_NAMES))
+                        }
+                    })
+                except Exception as img_err:
+                    logger.warning(f"Skip {fname}: {img_err}")
+                    results.append({
+                        "filename": fname,
+                        "true_label": true_label,
+                        "predicted_label": "Error",
+                        "confidence": 0.0,
+                        "correct": False,
+                        "all_scores": {},
+                        "error": str(img_err)
+                    })
+
+        if not results:
+            raise HTTPException(status_code=400,
+                detail="Tidak ada gambar valid ditemukan dalam ZIP. "
+                       "Pastikan ZIP berisi sub-folder dengan nama kelas.")
+
+        # Hitung confusion matrix (5x5)
+        n = len(CLASS_NAMES)
+        cm = [[0] * n for _ in range(n)]
+        for r in results:
+            if r["predicted_label"] in CLASS_NAMES and r["true_label"] in CLASS_NAMES:
+                ti = CLASS_NAMES.index(r["true_label"])
+                pi = CLASS_NAMES.index(r["predicted_label"])
+                cm[ti][pi] += 1
+
+        # Hitung metrics per kelas
+        metrics_per_class = {}
+        total_correct = sum(1 for r in results if r["correct"])
+        total = len(results)
+        accuracy = round(total_correct / total * 100, 2) if total > 0 else 0.0
+
+        for i, cls in enumerate(CLASS_NAMES):
+            tp = cm[i][i]
+            fp = sum(cm[j][i] for j in range(n) if j != i)
+            fn = sum(cm[i][j] for j in range(n) if j != i)
+            precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+            recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+            f1 = (2 * precision * recall / (precision + recall)
+                  if (precision + recall) > 0 else 0.0)
+            metrics_per_class[cls] = {
+                "precision": round(precision * 100, 2),
+                "recall": round(recall * 100, 2),
+                "f1_score": round(f1 * 100, 2),
+                "support": sum(cm[i])
+            }
+
+        return {
+            "status": "success",
+            "total_images": total,
+            "correct_predictions": total_correct,
+            "accuracy": accuracy,
+            "class_names": CLASS_NAMES,
+            "results": results,
+            "confusion_matrix": cm,
+            "metrics": metrics_per_class
+        }
+
+    except HTTPException:
+        raise
+    except zipfile.BadZipFile:
+        raise HTTPException(status_code=400, detail="File ZIP tidak valid atau rusak.")
+    except Exception as e:
+        logger.error(f"Error predict-batch: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Kesalahan saat batch prediksi: {str(e)}")
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
 # ==================== EXCEPTION HANDLERS ====================
