@@ -1,0 +1,392 @@
+/* BeanScope - Main Stylesheet */
+
+/* ========================================
+   CSS Variables & Global Styles
+   ======================================== */
+
+:root {
+    /* Coffee Theme Colors - Used for all pages */
+    --primary-color: #4B3621;
+    /* Deep Espresso */
+    --secondary-color: #6F4E37;
+    /* Coffee Wood */
+    --accent-color: #A67B5B;
+    /* Roasted Bean */
+    --light-color: #FDF8F5;
+    /* Latte Foam */
+    --dark-color: #2C1E12;
+    /* Dark Roast */
+    --bg-light: #F5EBE0;
+    /* Light Coffee Cream */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ========================================
+   Navbar Styles
+   ======================================== */
+
+.navbar-light .navbar-brand {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.navbar-nav .nav-link {
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.navbar-nav .nav-link:hover {
+    background: rgba(75, 54, 33, 0.1);
+    transform: translateY(-2px);
+    color: var(--secondary-color);
+}
+
+.navbar-nav .nav-link.active {
+    background: rgba(75, 54, 33, 0.15);
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.navbar-brand {
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+}
+
+/* ========================================
+   Home Page Styles
+   ======================================== */
+
+body.home-page {
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+/* Hero Section */
+.hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('https://www.transparenttextures.com/patterns/dark-leather.png');
+    opacity: 0.1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+}
+
+.hero-logo {
+    max-width: 200px;
+    margin-bottom: 2rem;
+    animation: fadeInDown 1s ease;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+    animation: fadeInUp 1s ease 0.2s both;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    font-weight: 300;
+    margin-bottom: 2rem;
+    opacity: 0.95;
+    animation: fadeInUp 1s ease 0.4s both;
+}
+
+.hero-cta {
+    animation: fadeInUp 1s ease 0.6s both;
+}
+
+.btn-hero {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.btn-hero:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.hero-image {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* About Section */
+.about-section {
+    padding: 100px 0;
+    background: var(--bg-light);
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--accent-color);
+    border-radius: 2px;
+}
+
+.about-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #555;
+}
+
+/* Defect Examples Gallery */
+.defect-card {
+    text-align: center;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.defect-card:hover {
+    transform: translateY(-5px);
+}
+
+.defect-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border: 3px solid var(--accent-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.defect-card:hover img {
+    border-color: var(--primary-color);
+    box-shadow: 0 8px 25px rgba(75, 54, 33, 0.2);
+}
+
+.defect-label {
+    margin-top: 0.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+/* Features Section */
+.features-section {
+    padding: 100px 0;
+    background: white;
+}
+
+.feature-card {
+    padding: 40px 30px;
+    border-radius: 20px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(75, 54, 33, 0.15);
+    border-color: var(--accent-color);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    color: white;
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.feature-text {
+    color: #666;
+    line-height: 1.7;
+}
+
+/* Footer */
+.footer {
+    background: var(--dark-color);
+    color: white;
+    padding: 40px 0;
+    text-align: center;
+}
+
+/* ========================================
+   Predict Page Styles
+   ======================================== */
+
+body.predict-page {
+    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+body.predict-page::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://www.transparenttextures.com/patterns/dark-leather.png');
+    opacity: 0.1;
+    z-index: -1;
+}
+
+.main-container {
+    width: 100%;
+    padding: 40px 0;
+    min-height: calc(100vh - 70px);
+    /* Account for navbar height */
+}
+
+.header-title {
+    color: var(--light-color);
+    text-align: center;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+    margin-bottom: 40px;
+}
+
+.card {
+    border-radius: 20px;
+    border: 1px solid rgba(166, 123, 91, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.98);
+}
+
+.upload-area {
+    border: 2px dashed var(--accent-color);
+    background: #fdfaf8;
+    border-radius: 15px;
+    padding: 50px;
+    transition: 0.3s all ease;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    background: #f5ece5;
+    border-color: var(--primary-color);
+    transform: scale(1.01);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(75, 54, 33, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a3e2c 0%, #3a2a19 100%);
+    box-shadow: 0 6px 20px rgba(75, 54, 33, 0.4);
+}
+
+/* ========================================
+   Animations
+   ======================================== */
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+}
