@@ -8,122 +8,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     @vite('resources/css/style.css')
-    <style>
-        /* ===== Page Layout ===== */
-        .batch-page {
-            min-height: 100vh;
-            background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
-                        url('{{ asset('Image/home.jpg') }}');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-
-        /* ===== Cards ===== */
-        .glass-card {
-            background: rgba(255,255,255,0.97);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-            border: none;
-        }
-
-        /* ===== Upload area ===== */
-        .upload-zone {
-            border: 2.5px dashed #a0856b;
-            border-radius: 14px;
-            padding: 2.5rem 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: background .25s, border-color .25s;
-            background: #fffaf6;
-        }
-        .upload-zone:hover, .upload-zone.drag-over {
-            border-color: #6b4226;
-            background: #f5ede6;
-        }
-        .upload-zone i { font-size: 3rem; color: #a0856b; }
-
-        /* ===== Progress ring ===== */
-        .progress-ring-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        #progressBar { height: 22px; border-radius: 11px; }
-
-        /* ===== Metric badges ===== */
-        .metric-card {
-            border-radius: 14px;
-            padding: 1.2rem 1rem;
-            text-align: center;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        }
-        .metric-card .metric-value { font-size: 2rem; font-weight: 700; }
-        .metric-card .metric-label { font-size: 0.82rem; color: #666; margin-top: 4px; }
-
-        /* ===== Results table ===== */
-        .results-table th { background: #6b4226; color: #fff; }
-        .results-table td, .results-table th {
-            vertical-align: middle;
-            font-size: 0.88rem;
-        }
-        .badge-correct   { background: #198754; color:#fff; }
-        .badge-incorrect { background: #dc3545; color:#fff; }
-
-        /* ===== Confusion Matrix ===== */
-        .cm-wrap { overflow-x: auto; }
-        .cm-table { border-collapse: separate; border-spacing: 3px; min-width: 520px; }
-        .cm-table th {
-            background: #6b4226;
-            color: #fff;
-            padding: 8px 10px;
-            font-size: 0.78rem;
-            text-align: center;
-            border-radius: 6px;
-        }
-        .cm-table .row-label {
-            background: #a0856b;
-            color: #fff;
-            font-weight: 600;
-            font-size: 0.78rem;
-            padding: 8px 10px;
-            border-radius: 6px;
-            white-space: nowrap;
-        }
-        .cm-cell {
-            width: 74px;
-            height: 60px;
-            text-align: center;
-            vertical-align: middle;
-            font-weight: 700;
-            font-size: 1.05rem;
-            border-radius: 8px;
-            transition: transform .15s;
-        }
-        .cm-cell:hover { transform: scale(1.08); cursor: default; }
-
-        /* ===== Per-class metrics ===== */
-        .cls-metrics-table th { background: #a0856b; color: #fff; font-size: 0.85rem; }
-        .cls-metrics-table td { font-size: 0.85rem; }
-
-        /* ===== Filter / search bar ===== */
-        #filterRow .form-select, #filterRow input { font-size: 0.85rem; }
-
-        /* ===== Responsive tweaks ===== */
-        @media (max-width: 576px) {
-            .metric-value { font-size: 1.5rem !important; }
-        }
-    </style>
 </head>
-<body class="batch-page">
+<body class="batch-page" style="background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('{{ asset('Image/home.jpg') }}'); background-size: cover; background-position: center; background-attachment: fixed;">
     @include('components.navbar')
 
     <div class="container py-5">
 
         {{-- ===== Header ===== --}}
-        <div class="text-center mb-5">
+        <div class="text-center mb-5" id="print-batch-header">
             <img src="{{ asset('Image/LogoOval.png') }}" alt="BeanScope Logo" style="height:70px;">
             <h1 class="text-white fw-bold display-5 mt-2">Batch Testing</h1>
             <p class="text-white-50 fs-5">Upload ZIP dataset untuk menguji performa model secara batch</p>
@@ -149,7 +41,7 @@
         @endif
 
         {{-- ===== Upload Card ===== --}}
-        <div class="row justify-content-center mb-4">
+        <div class="row justify-content-center mb-4 no-print">
             <div class="col-lg-8">
                 <div class="glass-card p-4">
                     <h5 class="fw-bold mb-1"><i class="bi bi-archive-fill text-warning"></i> Upload File ZIP</h5>
@@ -397,10 +289,10 @@
         </div>
 
         {{-- ── Per-Image Results Table ── --}}
-        <div class="row justify-content-center mb-5">
+        <div class="row justify-content-center mb-5" id="print-report">
             <div class="col-lg-10">
                 <div class="glass-card p-4">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3" >
                         <h5 class="fw-bold mb-0">
                             <i class="bi bi-table text-success"></i> Laporan Prediksi Per Gambar
                         </h5>
@@ -488,11 +380,27 @@
             </div>
         </div>
 
-        {{-- Action button --}}
-        <div class="text-center mb-5">
+        {{-- Print Header (hanya muncul saat cetak) --}}
+        <div class="print-header">
+            <img src="{{ asset('Image/LogoOval.png') }}" alt="BeanScope Logo" style="height:55px;">
+            <h2 class="mt-2 mb-1">BeanScope &mdash; Laporan Batch Testing</h2>
+            <p class="mb-0">Akurasi: <strong>{{ $accuracy }}%</strong> &nbsp;|&nbsp; Total: <strong>{{ $total }} gambar</strong> &nbsp;|&nbsp; Benar: <strong>{{ $correct }}</strong></p>
+            <small>Tanggal cetak: {{ now()->format('d/m/Y H:i') }} WIB</small>
+        </div>
+
+        {{-- Action buttons --}}
+        <div class="text-center mb-5 no-print" id="print-only-results">
+            <button onclick="window.print()" class="btn btn-success btn-lg px-5 me-3">
+                <i class="bi bi-printer-fill"></i> Cetak / Print Laporan
+            </button>
             <a href="{{ route('batch-test.index') }}" class="btn btn-outline-light btn-lg px-5">
                 <i class="bi bi-arrow-clockwise"></i> Upload ZIP Baru
             </a>
+        </div>
+
+        {{-- Print Footer --}}
+        <div class="print-footer">
+            Dicetak dari BeanScope &mdash; Sistem Deteksi Cacat Biji Kopi Berbasis AI
         </div>
 
         @endif {{-- end isset($batchResult) --}}
@@ -501,92 +409,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @vite('resources/js/script.js')
-
-    <script>
-    // ===== Drag & Drop =====
-    const dropZone = document.getElementById('dropZone');
-    const zipInput = document.getElementById('zipInput');
-    const submitBtn = document.getElementById('submitBtn');
-    const fileInfo  = document.getElementById('fileInfo');
-    const fileName  = document.getElementById('fileName');
-    const fileSize  = document.getElementById('fileSize');
-
-    ['dragenter','dragover'].forEach(e => {
-        dropZone.addEventListener(e, ev => {
-            ev.preventDefault();
-            dropZone.classList.add('drag-over');
-        });
-    });
-    ['dragleave','drop'].forEach(e => {
-        dropZone.addEventListener(e, ev => {
-            ev.preventDefault();
-            dropZone.classList.remove('drag-over');
-        });
-    });
-    dropZone.addEventListener('drop', ev => {
-        const files = ev.dataTransfer.files;
-        if (files.length) {
-            // Assign to input via DataTransfer
-            const dt = new DataTransfer();
-            dt.items.add(files[0]);
-            zipInput.files = dt.files;
-            onFileSelected(zipInput);
-        }
-    });
-
-    function onFileSelected(input) {
-        const f = input.files[0];
-        if (!f) return;
-        fileName.textContent = f.name;
-        fileSize.textContent = '(' + (f.size / 1024 / 1024).toFixed(2) + ' MB)';
-        fileInfo.classList.remove('d-none');
-        submitBtn.disabled = false;
-    }
-
-    // ===== Fake progress on submit =====
-    document.getElementById('batchForm').addEventListener('submit', function() {
-        document.getElementById('progressWrap').classList.remove('d-none');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Memproses ...';
-        let pct = 0;
-        const bar = document.getElementById('progressBar');
-        const pctLabel = document.getElementById('progressPct');
-        const iv = setInterval(() => {
-            pct = Math.min(pct + Math.random() * 4, 92);
-            bar.style.width = pct.toFixed(0) + '%';
-            pctLabel.textContent = pct.toFixed(0) + '%';
-        }, 400);
-    });
-
-    // ===== Table filter =====
-    const searchInput  = document.getElementById('searchInput');
-    const filterClass  = document.getElementById('filterClass');
-    const filterResult = document.getElementById('filterResult');
-
-    function applyFilter() {
-        const q   = (searchInput?.value || '').toLowerCase();
-        const cls = filterClass?.value  || '';
-        const res = filterResult?.value || '';
-        const rows = document.querySelectorAll('.result-row');
-        let visible = 0;
-        rows.forEach(row => {
-            const fn    = row.cells[1].textContent.toLowerCase();
-            const trueL = row.dataset.true;
-            const corr  = row.dataset.correct;
-            const show  = (!q || fn.includes(q))
-                       && (!cls || trueL === cls)
-                       && (!res || corr === res);
-            row.style.display = show ? '' : 'none';
-            if (show) visible++;
-        });
-        const cnt = document.getElementById('showingCount');
-        if (cnt) cnt.textContent = 'Menampilkan ' + visible + ' dari ' + rows.length + ' gambar';
-    }
-
-    if (searchInput)  searchInput.addEventListener('input',  applyFilter);
-    if (filterClass)  filterClass.addEventListener('change', applyFilter);
-    if (filterResult) filterResult.addEventListener('change', applyFilter);
-    applyFilter(); // initial call
-    </script>
 </body>
 </html>

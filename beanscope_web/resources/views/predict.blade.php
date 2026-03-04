@@ -23,7 +23,7 @@
         </div>
 
         <!-- Upload Form Card -->
-        <div class="row justify-content-center">
+        <div class="row justify-content-center no-print">
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-body p-4">
@@ -184,10 +184,25 @@
                             </div>
                         </div>
 
-                        <div class="text-center mt-4">
+                        {{-- Print Header (hanya muncul saat cetak) --}}
+                        <div class="print-header">
+                            <img src="{{ asset('Image/LogoOval.png') }}" alt="BeanScope Logo" style="height:50px;">
+                            <h3 class="mt-1 mb-0">BeanScope — Hasil Analisis Biji Kopi</h3>
+                            <small>Tanggal cetak: {{ now()->format('d/m/Y H:i') }} WIB</small>
+                        </div>
+
+                        <div class="text-center mt-4 no-print">
+                            <button onclick="window.print()" class="btn btn-success me-2">
+                                <i class="bi bi-printer-fill"></i> Cetak / Print
+                            </button>
                             <a href="{{ route('predict.index') }}" class="btn btn-outline-primary">
                                 <i class="bi bi-arrow-clockwise"></i> Analisis Gambar Lain
                             </a>
+                        </div>
+
+                        {{-- Print Footer (hanya muncul saat cetak) --}}
+                        <div class="print-footer">
+                            Dicetak dari BeanScope — Sistem Deteksi Cacat Biji Kopi Berbasis AI
                         </div>
                     </div>
                 </div>
@@ -196,7 +211,7 @@
         @endif
 
         <!-- Info Card -->
-        <div class="row justify-content-center mt-4">
+        <div class="row justify-content-center mt-4 no-print">
             <div class="col-lg-8">
                 <div class="card bg-light">
                     <div class="card-body p-3">

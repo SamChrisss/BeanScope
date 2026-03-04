@@ -390,3 +390,318 @@ body.predict-page::before {
         font-size: 2rem;
     }
 }
+
+/* ========================================
+   Batch Test Page Styles
+   ======================================== */
+
+.batch-page {
+    min-height: 100vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+        url('../Image/home.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* Cards */
+.glass-card {
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    border: none;
+}
+
+/* Upload area */
+.upload-zone {
+    border: 2.5px dashed #a0856b;
+    border-radius: 14px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background .25s, border-color .25s;
+    background: #fffaf6;
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+    border-color: #6b4226;
+    background: #f5ede6;
+}
+
+.upload-zone i {
+    font-size: 3rem;
+    color: #a0856b;
+}
+
+/* Progress bar */
+#progressBar {
+    height: 22px;
+    border-radius: 11px;
+}
+
+/* Metric badges */
+.metric-card {
+    border-radius: 14px;
+    padding: 1.2rem 1rem;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.metric-card .metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.metric-card .metric-label {
+    font-size: 0.82rem;
+    color: #666;
+    margin-top: 4px;
+}
+
+/* Results table */
+.results-table th {
+    background: #6b4226;
+    color: #fff;
+}
+
+.results-table td,
+.results-table th {
+    vertical-align: middle;
+    font-size: 0.88rem;
+}
+
+.badge-correct {
+    background: #198754;
+    color: #fff;
+}
+
+.badge-incorrect {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* Confusion Matrix */
+.cm-wrap {
+    overflow-x: auto;
+}
+
+.cm-table {
+    border-collapse: separate;
+    border-spacing: 3px;
+    min-width: 520px;
+}
+
+.cm-table th {
+    background: #6b4226;
+    color: #fff;
+    padding: 8px 10px;
+    font-size: 0.78rem;
+    text-align: center;
+    border-radius: 6px;
+}
+
+.cm-table .row-label {
+    background: #a0856b;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.78rem;
+    padding: 8px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.cm-cell {
+    width: 74px;
+    height: 60px;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-radius: 8px;
+    transition: transform .15s;
+}
+
+.cm-cell:hover {
+    transform: scale(1.08);
+    cursor: default;
+}
+
+/* Per-class metrics */
+.cls-metrics-table th {
+    background: #a0856b;
+    color: #fff;
+    font-size: 0.85rem;
+}
+
+.cls-metrics-table td {
+    font-size: 0.85rem;
+}
+
+/* Filter / search bar */
+#filterRow .form-select,
+#filterRow input {
+    font-size: 0.85rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+    .metric-value {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* ========================================
+   Shared Print Styles (predict & batch-test)
+   ======================================== */
+
+/* Hide print-only elements on screen */
+.print-header,
+.print-footer {
+    display: none;
+}
+
+@media print {
+
+    /* ===============================
+       BASIC RESET
+       =============================== */
+
+    body {
+        background: #fff !important;
+        color: #000 !important;
+        margin: 0 !important;
+    }
+
+    .navbar,
+    .no-print,
+    nav,
+    footer {
+        display: none !important;
+    }
+
+    body.batch-page {
+        background: #fff !important;
+    }
+
+    /* ===============================
+       HILANGKAN CM & METRIK
+       =============================== */
+
+    .cm-wrap,
+    .cm-table,
+    .glass-card:has(.cm-wrap) {
+        display: none !important;
+    }
+
+    .cls-metrics-table,
+    .glass-card:has(.cls-metrics-table) {
+        display: none !important;
+    }
+
+    /* ===============================
+       FIX CENTER LAYOUT
+       =============================== */
+
+    .container {
+        width: 100% !important;
+        max-width: 1100px !important;
+        margin: 0 auto !important;
+    }
+
+    .row {
+        justify-content: center !important;
+    }
+
+    .col-lg-10,
+    .col-lg-8 {
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    .glass-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        margin: 0 auto !important;
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+    }
+
+    /* ===============================
+       TABLE FIX
+       =============================== */
+
+    .table-responsive {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+    }
+
+    thead {
+        display: table-header-group !important;
+    }
+
+    tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* ===============================
+       PRESERVE COLORS
+       =============================== */
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .results-table th {
+        background: #6b4226 !important;
+        color: #fff !important;
+    }
+
+    .badge-correct {
+        background: #198754 !important;
+        color: #fff !important;
+    }
+
+    .badge-incorrect {
+        background: #dc3545 !important;
+        color: #fff !important;
+    }
+
+    .progress-bar.bg-success {
+        background: #198754 !important;
+    }
+
+    .progress-bar.bg-danger {
+        background: #dc3545 !important;
+    }
+
+    /* ===============================
+       PRINT HEADER & FOOTER
+       =============================== */
+
+    .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 18px;
+        border-bottom: 2px solid #6b4226;
+        padding-bottom: 10px;
+    }
+
+    .print-footer {
+        display: block !important;
+        text-align: center;
+        margin-top: 22px;
+        font-size: 0.8rem;
+        color: #666;
+        border-top: 1px solid #ccc;
+        padding-top: 8px;
+    }
+
+}
